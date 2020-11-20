@@ -4,8 +4,8 @@ import time
 from tweetUtils import get_alt_texts, get_medias, are_photos, is_video
 from tweeter import tweet_descriptions
 
-# 12s is min time to not exceed limit
-SLEEP_TIME = 15
+# 12s is min time to not exceed limit -- use 15s for long term
+SLEEP_TIME = 5
 
 LAST_HANDLED_FILE_NAME = "last_handled.txt"
 
@@ -21,11 +21,13 @@ auth.set_access_token(ACCESS_KEY, ACCESS_KEY_SECRET)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 # Pre testing tweet Id 889145223221096448
+# Post testing tweet Id 1329878347438907393
+# Post photo testing id 1328710401043931138
 last_handled_id = None
 with open(LAST_HANDLED_FILE_NAME, 'r') as f:
   last_handled_id = f.read().strip()
 
-# TODO use streams instead of event loop. for now, the sleep time will not exceed rate limit
+# TODO use streams instead of event loop (loop is easier to test). For now, the sleep time will not exceed rate limit.
 while (True):
   time.sleep(SLEEP_TIME)
   print("iteration\n")
@@ -42,6 +44,7 @@ while (True):
   reply_to_tweet_ids = [mention.in_reply_to_status_id_str for mention in mentions]
   reply_to_tweets = api.statuses_lookup(reply_to_tweet_ids, include_entities=True, tweet_mode='extended', include_ext_alt_text=True)
   for tweet in reply_to_tweets:
+    print(tweet.id)
     medias = get_medias(tweet)
     if medias is None or len(medias) == 0:
       print("no media found for tweet {}".format(tweet.id))
@@ -51,7 +54,7 @@ while (True):
       alt_texts = get_alt_texts(medias)
       # Maybe filter low confidence responses here
       print(alt_texts)
-      tweet_descriptions([alt_text[0] for alt_text in alt_texts])
+      tweet_descriptions(api, [alt_text[0] for alt_text in alt_texts], tweet.id)
 
     elif is_video(medias):
       print("TODO implement captioning")
