@@ -46,35 +46,39 @@ while (True):
   with open(LAST_HANDLED_FILE_NAME, "w") as f:
     f.write(str(last_handled_id))
 
-  reply_to_tweet_ids = [mention.in_reply_to_status_id_str for mention in mentions]
-  reply_to_tweets = api.statuses_lookup(reply_to_tweet_ids, include_entities=True, tweet_mode='extended', include_ext_alt_text=True)
-  for tweet in reply_to_tweets:
-    medias = get_medias(tweet)
-    if medias is None or len(medias) == 0:
-      print("no media found for tweet {}".format(tweet.id))
-      continue
-
-    if are_photos(medias):
-      alt_texts = get_alt_texts(medias)
-      print(alt_texts)
-      tweet_descriptions(api, alt_texts, tweet.id)
-
-    elif is_video(medias):
-      video_url = extract_video_url(medias[0])
-      if video_url is None:
-        print("Could not extract_video_url")
+  try:
+    reply_to_tweet_ids = [mention.in_reply_to_status_id_str for mention in mentions]
+    reply_to_tweets = api.statuses_lookup(reply_to_tweet_ids, include_entities=True, tweet_mode='extended', include_ext_alt_text=True)
+    for tweet in reply_to_tweets:
+      medias = get_medias(tweet)
+      if medias is None or len(medias) == 0:
+        print("no media found for tweet {}".format(tweet.id))
         continue
-      captions = get_captions_from_video_url(video_url)
-      if not captions:
-        print("Could not extract captions")
-        continue
-      tweet_captions(api, captions, tweet.id)
 
-    elif is_gif(medias):
-      alt_texts = get_alt_texts(medias)
-      tweet_descriptions(api, alt_texts, tweet.id) 
+      if are_photos(medias):
+        alt_texts = get_alt_texts(medias)
+        print(alt_texts)
+        tweet_descriptions(api, alt_texts, tweet.id)
 
-    else:
-      print("unsupported media type for tweet {}".format(tweet.id))
-      print(tweet._json)
-      tweet_unsupported(api, tweet.id)
+      elif is_video(medias):
+        video_url = extract_video_url(medias[0])
+        if video_url is None:
+          print("Could not extract_video_url")
+          continue
+        captions = get_captions_from_video_url(video_url)
+        if not captions:
+          print("Could not extract captions")
+          continue
+        tweet_captions(api, captions, tweet.id)
+
+      elif is_gif(medias):
+        alt_texts = get_alt_texts(medias)
+        tweet_descriptions(api, alt_texts, tweet.id) 
+
+      else:
+        print("unsupported media type for tweet {}".format(tweet.id))
+        print(tweet._json)
+        tweet_unsupported(api, tweet.id)
+
+  except Exception as e:
+    print(e)
