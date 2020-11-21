@@ -54,7 +54,6 @@ while (True):
 
     if are_photos(medias):
       alt_texts = get_alt_texts(medias)
-      # Maybe filter low confidence responses here
       print(alt_texts)
       tweet_descriptions(api, alt_texts, tweet.id)
 
