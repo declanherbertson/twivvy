@@ -38,3 +38,11 @@ def extract_video_url(media):
   except:
     return None
     
+def zip_mentions_to_reply_tweets(mentions, tweets):
+  reply_to_id_dict = {}
+  for mention in mentions:
+    reply_to_id_dict[mention.in_reply_to_status_id_str] = mention
+  results = []
+  for tweet in tweets:
+    results.append((reply_to_id_dict[str(tweet.id)], tweet))
+  return results

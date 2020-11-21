@@ -1,7 +1,7 @@
 import tweepy
 import os
 import time
-from tweetUtils import get_alt_texts, get_medias, are_photos, is_video, is_gif, extract_video_url
+from tweetUtils import get_alt_texts, get_medias, are_photos, is_video, is_gif, extract_video_url, zip_mentions_to_reply_tweets
 from tweeter import tweet_descriptions, tweet_captions, tweet_unsupported
 from videoUtil import get_captions_from_video_url
 
@@ -49,7 +49,8 @@ while (True):
   try:
     reply_to_tweet_ids = [mention.in_reply_to_status_id_str for mention in mentions]
     reply_to_tweets = api.statuses_lookup(reply_to_tweet_ids, include_entities=True, tweet_mode='extended', include_ext_alt_text=True)
-    for tweet in reply_to_tweets:
+    zipped_tweets = zip_mentions_to_reply_tweets(mentions, reply_to_tweets)
+    for mention, tweet in zipped_tweets:
       medias = get_medias(tweet)
       if medias is None or len(medias) == 0:
         print("no media found for tweet {}".format(tweet.id))
@@ -58,7 +59,7 @@ while (True):
       if are_photos(medias):
         alt_texts = get_alt_texts(medias)
         print(alt_texts)
-        tweet_descriptions(api, alt_texts, tweet.id)
+        tweet_descriptions(api, alt_texts, mention.id)
 
       elif is_video(medias):
         video_url = extract_video_url(medias[0])
@@ -69,11 +70,11 @@ while (True):
         if not captions:
           print("Could not extract captions")
           continue
-        tweet_captions(api, captions, tweet.id)
+        tweet_captions(api, captions, mention.id)
 
       elif is_gif(medias):
         alt_texts = get_alt_texts(medias)
-        tweet_descriptions(api, alt_texts, tweet.id) 
+        tweet_descriptions(api, alt_texts, mention.id) 
 
       else:
         print("unsupported media type for tweet {}".format(tweet.id))
@@ -81,4 +82,5 @@ while (True):
         tweet_unsupported(api, tweet.id)
 
   except Exception as e:
-    print(e)
+    print("exception!")
+    print(repr(e))
