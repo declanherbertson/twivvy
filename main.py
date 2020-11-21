@@ -1,8 +1,8 @@
 import tweepy
 import os
 import time
-from tweetUtils import get_alt_texts, get_medias, are_photos, is_video, extract_video_url
-from tweeter import tweet_descriptions, tweet_captions
+from tweetUtils import get_alt_texts, get_medias, are_photos, is_video, is_gif, extract_video_url
+from tweeter import tweet_descriptions, tweet_captions, tweet_unsupported
 from videoUtil import get_captions_from_video_url
 
 # 12s is min time to not exceed limit -- use 15s for long term
@@ -22,8 +22,10 @@ auth.set_access_token(ACCESS_KEY, ACCESS_KEY_SECRET)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 # Pre testing tweet Id 889145223221096448
-# Post testing tweet Id 1329878347438907393
-# Post photo testing id 1328710401043931138
+# start at bts id 1329878347438907393
+# post bts id: 1329955777038020608
+# starts video id 1328710401043931138
+# post dancing dog id 1329965439980429312
 last_handled_id = None
 with open(LAST_HANDLED_FILE_NAME, 'r') as f:
   last_handled_id = f.read().strip()
@@ -54,7 +56,7 @@ while (True):
       alt_texts = get_alt_texts(medias)
       # Maybe filter low confidence responses here
       print(alt_texts)
-      tweet_descriptions(api, [alt_text[0] for alt_text in alt_texts], tweet.id)
+      tweet_descriptions(api, alt_texts, tweet.id)
 
     elif is_video(medias):
       video_url = extract_video_url(medias[0])
@@ -67,5 +69,11 @@ while (True):
         continue
       tweet_captions(api, captions, tweet.id)
 
+    elif is_gif(medias):
+      alt_texts = get_alt_texts(medias)
+      tweet_descriptions(api, alt_texts, tweet.id)
+
     else:
       print("unsupported media type for tweet {}".format(tweet.id))
+      print(tweet._json)
+      tweet_unsupported(api, tweet.id)

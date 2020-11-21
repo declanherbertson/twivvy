@@ -6,6 +6,9 @@ def are_photos(medias):
 def is_video(medias):
   return medias[0]["type"] == "video"
 
+def is_gif(medias):
+  return medias[0]["type"] == "animated_gif"
+
 def has_alt_text(media):
   return ("ext_alt_text" in media
   and media["ext_alt_text"] is not None
