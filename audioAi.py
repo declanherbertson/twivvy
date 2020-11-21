@@ -9,7 +9,7 @@ def caption_audio(filename):
   audio_input = speechsdk.AudioConfig(filename=filename)
   speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
   # NOTE: this only captions the first 15-30s, use continuous recognition for longer captions, twit max len = 2min 20sec
-  result = speech_recognizer.recognize_once_async().get()
+  result = speech_recognizer.recognize_once()
 
   # Error Checking
   if result.reason == speechsdk.ResultReason.RecognizedSpeech:
@@ -28,4 +28,4 @@ def caption_audio(filename):
 
 # test_audio = "male_FDUwvzDY.wav"
 # test_audio_long = "male.wav"
-# print(caption_audio(test_audio_long))
+# print(caption_audio(test_audio))

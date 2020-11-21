@@ -26,3 +26,10 @@ def get_medias(tweet):
     return tweet.entities["media"]
   else:
     return None
+
+def extract_video_url(media):
+  try:
+    return media["video_info"]["variants"][0]["url"]
+  except:
+    return None
+    

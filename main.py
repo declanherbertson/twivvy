@@ -1,8 +1,9 @@
 import tweepy
 import os
 import time
-from tweetUtils import get_alt_texts, get_medias, are_photos, is_video
-from tweeter import tweet_descriptions
+from tweetUtils import get_alt_texts, get_medias, are_photos, is_video, extract_video_url
+from tweeter import tweet_descriptions, tweet_captions
+from videoUtil import get_captions_from_video_url
 
 # 12s is min time to not exceed limit -- use 15s for long term
 SLEEP_TIME = 5
@@ -44,7 +45,6 @@ while (True):
   reply_to_tweet_ids = [mention.in_reply_to_status_id_str for mention in mentions]
   reply_to_tweets = api.statuses_lookup(reply_to_tweet_ids, include_entities=True, tweet_mode='extended', include_ext_alt_text=True)
   for tweet in reply_to_tweets:
-    print(tweet.id)
     medias = get_medias(tweet)
     if medias is None or len(medias) == 0:
       print("no media found for tweet {}".format(tweet.id))
@@ -57,11 +57,15 @@ while (True):
       tweet_descriptions(api, [alt_text[0] for alt_text in alt_texts], tweet.id)
 
     elif is_video(medias):
-      print("TODO implement captioning")
+      video_url = extract_video_url(medias[0])
+      if video_url is None:
+        print("Could not extract_video_url")
+        continue
+      captions = get_captions_from_video_url(video_url)
+      if not captions:
+        print("Could not extract captions")
+        continue
+      tweet_captions(api, captions, tweet.id)
 
     else:
       print("unsupported media type for tweet {}".format(tweet.id))
-
-
-
-
