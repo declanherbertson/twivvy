@@ -1,4 +1,4 @@
-from audioAi import caption_audio
+from audioAi import caption_audio, caption_audio_long
 import urllib.request
 import subprocess
 import os
@@ -15,7 +15,8 @@ def get_captions_from_video_url(video_url):
     subprocess.call(command, shell=True)
 
     # caption audio
-    captions = caption_audio(audio_file_name)
+    # captions = caption_audio(audio_file_name)
+    captions = caption_audio_long(audio_file_name)
 
     # delete audio and video
     os.remove(audio_file_name)

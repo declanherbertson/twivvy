@@ -72,7 +72,7 @@ while (True):
 
     elif is_gif(medias):
       alt_texts = get_alt_texts(medias)
-      tweet_descriptions(api, alt_texts, tweet.id)
+      tweet_descriptions(api, alt_texts, tweet.id) 
 
     else:
       print("unsupported media type for tweet {}".format(tweet.id))
