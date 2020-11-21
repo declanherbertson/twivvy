@@ -26,6 +26,8 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 # post bts id: 1329955777038020608
 # starts video id 1328710401043931138
 # post dancing dog id 1329965439980429312
+# post bts 2 id 1329997471213260800
+
 last_handled_id = None
 with open(LAST_HANDLED_FILE_NAME, 'r') as f:
   last_handled_id = f.read().strip()

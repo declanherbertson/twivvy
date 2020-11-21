@@ -32,7 +32,9 @@ def get_medias(tweet):
 
 def extract_video_url(media):
   try:
-    return media["video_info"]["variants"][0]["url"]
+    variants = media["video_info"]["variants"]
+    mp4s = [v for v in variants if v["content_type"] == "video/mp4"]
+    return mp4s[0]["url"]
   except:
     return None
     
