@@ -6,7 +6,7 @@ from tweeter import tweet_descriptions, tweet_captions, tweet_unsupported
 from videoUtil import get_captions_from_video_url
 
 # 12s is min time to not exceed limit -- use 15s for long term
-SLEEP_TIME = 5
+SLEEP_TIME = 15
 
 LAST_HANDLED_FILE_NAME = "last_handled.txt"
 
@@ -35,7 +35,7 @@ with open(LAST_HANDLED_FILE_NAME, 'r') as f:
 # TODO use streams instead of event loop (loop is easier to test). For now, the sleep time will not exceed rate limit.
 while (True):
   time.sleep(SLEEP_TIME)
-  print("iteration\n")
+  # print("iteration\n")
 
   # Would use a cursor, but I should be using a stream anyway
   mentions = api.mentions_timeline(since_id=last_handled_id)
